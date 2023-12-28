@@ -132,10 +132,15 @@ prepare() {
   fi
 
   # Check if any ports that we need are open already
+  # the 4444 port is used by hydra
   nc -zv localhost 4444 && exit 1
+  # the 4445 port is used by hydra-login-consent
   nc -zv localhost 4445 && exit 1
+  # the 4446 port is used by hydra-kratos-login-consent
   nc -zv localhost 4446 && exit 1
+  # the 4455 port is used by the proxy app located in test/e2e/proxy
   nc -zv localhost 4455 && exit 1
+  # the 4456 port is used by the node ui app located in test/e2e/ui-node
   nc -zv localhost 4456 && exit 1
   nc -zv localhost 4457 && exit 1
   nc -zv localhost 4458 && exit 1

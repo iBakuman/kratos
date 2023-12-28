@@ -96,11 +96,14 @@ func ServePublic(r driver.Registry, cmd *cobra.Command, args []string, slOpts *s
 
 	n.Use(r.PrometheusManager())
 
+	// router is responsible for handling all public routes.
 	router := x.NewRouterPublic()
+	// csrf wraps the router and adds CSRF protection.
 	csrf := x.NewCSRFHandler(router, r)
 
 	n.UseFunc(x.CleanPath) // Prevent double slashes from breaking CSRF.
 	r.WithCSRFHandler(csrf)
+	// r.CSRFHandler() is the csrf handler set by r.WithCSRFHandler(csrf)
 	n.UseHandler(r.CSRFHandler())
 
 	// Disable CSRF for these endpoints
@@ -124,7 +127,7 @@ func ServePublic(r driver.Registry, cmd *cobra.Command, args []string, slOpts *s
 		handler = otelx.TraceHandler(handler, otelhttp.WithTracerProvider(tracer.Provider()))
 	}
 
-	//#nosec G112 -- the correct settings are set by graceful.WithDefaults
+	// #nosec G112 -- the correct settings are set by graceful.WithDefaults
 	server := graceful.WithDefaults(&http.Server{
 		Handler:   handler,
 		TLSConfig: &tls.Config{GetCertificate: certs, MinVersion: tls.VersionTLS12},
@@ -196,7 +199,7 @@ func ServeAdmin(r driver.Registry, cmd *cobra.Command, args []string, slOpts *se
 		)
 	}
 
-	//#nosec G112 -- the correct settings are set by graceful.WithDefaults
+	// #nosec G112 -- the correct settings are set by graceful.WithDefaults
 	server := graceful.WithDefaults(&http.Server{
 		Handler:   handler,
 		TLSConfig: &tls.Config{GetCertificate: certs, MinVersion: tls.VersionTLS12},

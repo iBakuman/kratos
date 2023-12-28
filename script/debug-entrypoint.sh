@@ -22,15 +22,30 @@ build() {
 
 start() {
   log "Starting Delve"
-  dlv --listen=:${DELVE_PORT} --headless=true --api-version=2 --accept-multiclient exec /${SERVICE_NAME} -- ${SERVICE_ARGS} &
+  (
+    kill_dlv() {
+      log "kill dlv_pid: $dlv_pid"
+      kill -9 "$dlv_pid"
+      exit 0
+    }
+    trap kill_dlv SIGTERM
+    while true; do
+      dlv --listen=:"${DELVE_PORT}" --headless=true --api-version=2 --accept-multiclient exec /"${SERVICE_NAME}" -- ${SERVICE_ARGS} &
+      dlv_pid=$!
+      log "get dlv_pid: $dlv_pid"
+      wait
+    done
+  )&
+  loop_pid=$!
+  log "get loop_pid: $loop_pid"
 }
 
 restart() {
   build
 
   log "Killing old processes"
-  killall dlv
-  killall ${SERVICE_NAME}
+  kill "$loop_pid"
+  killall "${SERVICE_NAME}"
 
   start
 }
