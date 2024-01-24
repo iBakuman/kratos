@@ -6,12 +6,14 @@ package sql
 import (
 	"context"
 	"embed"
+	"io/fs"
 	"time"
 
 	"github.com/gobuffalo/pop/v6"
 	"github.com/gofrs/uuid"
 	"github.com/laher/mergefs"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 
 	"github.com/ory/kratos/driver/config"
 	"github.com/ory/kratos/identity"
@@ -53,13 +55,50 @@ type (
 	}
 )
 
-func NewPersister(ctx context.Context, r persisterDependencies, c *pop.Connection) (*Persister, error) {
-	m, err := popx.NewMigrationBox(mergefs.Merge(migrations, networkx.Migrations), popx.NewMigrator(c, r.Logger(), r.Tracer(ctx), 0))
+type persisterOptions struct {
+	extraMigrations []fs.FS
+	disableLogging  bool
+}
+
+type persisterOption func(o *persisterOptions)
+
+func WithExtraMigrations(fss ...fs.FS) persisterOption {
+	return func(o *persisterOptions) {
+		o.extraMigrations = fss
+	}
+}
+
+func WithDisabledLogging(v bool) persisterOption {
+	return func(o *persisterOptions) {
+		o.disableLogging = v
+	}
+}
+
+func NewPersister(ctx context.Context, r persisterDependencies, c *pop.Connection, opts ...persisterOption) (*Persister, error) {
+	o := &persisterOptions{}
+	for _, f := range opts {
+		f(o)
+	}
+	logger := r.Logger()
+	if o.disableLogging {
+		logger.Logrus().SetLevel(logrus.WarnLevel)
+	}
+	m, err := popx.NewMigrationBox(
+		mergefs.Merge(
+			append(
+				[]fs.FS{
+					migrations, networkx.Migrations,
+				},
+				o.extraMigrations...,
+			)...,
+		),
+		popx.NewMigrator(c, logger, r.Tracer(ctx), 0),
+	)
 	if err != nil {
 		return nil, err
 	}
-	m.DumpMigrations = false
 
+	m.DumpMigrations = false
 	return &Persister{
 		c:               c,
 		mb:              m,

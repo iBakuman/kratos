@@ -51,7 +51,7 @@ func (s *Strategy) Login(w http.ResponseWriter, r *http.Request, f *login.Flow, 
 		return nil, err
 	}
 
-	if err := flow.MethodEnabledAndAllowedFromRequest(r, s.ID().String(), s.d); err != nil {
+	if err := flow.MethodEnabledAndAllowedFromRequest(r, f.GetFlowName(), s.ID().String(), s.d); err != nil {
 		return nil, err
 	}
 
@@ -147,7 +147,15 @@ func (s *Strategy) PopulateLoginMethod(r *http.Request, requestedAAL identity.Au
 		sr.UI.SetCSRF(s.d.GenerateCSRFToken(r))
 		sr.UI.SetNode(node.NewInputField("identifier", identifier, node.DefaultGroup, node.InputAttributeTypeHidden))
 	} else {
-		sr.UI.SetNode(node.NewInputField("identifier", "", node.DefaultGroup, node.InputAttributeTypeText, node.WithRequiredInputAttribute).WithMetaLabel(text.NewInfoNodeLabelID()))
+		ds, err := s.d.Config().DefaultIdentityTraitsSchemaURL(r.Context())
+		if err != nil {
+			return err
+		}
+		identifierLabel, err := login.GetIdentifierLabelFromSchema(r.Context(), ds.String())
+		if err != nil {
+			return err
+		}
+		sr.UI.SetNode(node.NewInputField("identifier", "", node.DefaultGroup, node.InputAttributeTypeText, node.WithRequiredInputAttribute).WithMetaLabel(identifierLabel))
 	}
 
 	sr.UI.SetCSRF(s.d.GenerateCSRFToken(r))

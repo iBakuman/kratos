@@ -18,6 +18,7 @@ import (
 	"github.com/ory/kratos/x"
 	"github.com/ory/x/jsonnetsecure"
 	"github.com/ory/x/logrusx"
+	"github.com/ory/x/otelx"
 )
 
 type testRequestBody struct {
@@ -244,7 +245,7 @@ func TestBuildRequest(t *testing.T) {
 	} {
 		t.Run(
 			"request-type="+tc.name, func(t *testing.T) {
-				rb, err := NewBuilder(json.RawMessage(tc.rawConfig), newTestDependencyProvider(t))
+				rb, err := NewBuilder(context.Background(), json.RawMessage(tc.rawConfig), newTestDependencyProvider(t), nil)
 				require.NoError(t, err)
 
 				assert.Equal(t, tc.bodyTemplateURI, rb.Config.TemplateURI)
@@ -272,13 +273,13 @@ func TestBuildRequest(t *testing.T) {
 
 	t.Run(
 		"cancel request", func(t *testing.T) {
-			rb, err := NewBuilder(json.RawMessage(
+			rb, err := NewBuilder(context.Background(), json.RawMessage(
 				`{
 	"url": "https://test.kratos.ory.sh/my_endpoint6",
 	"method": "POST",
 	"body": "file://./stub/cancel_body.jsonnet"
 }`,
-			), newTestDependencyProvider(t))
+			), newTestDependencyProvider(t), nil)
 			require.NoError(t, err)
 
 			_, err = rb.BuildRequest(context.Background(), json.RawMessage(`{}`))
@@ -296,6 +297,7 @@ func newTestDependencyProvider(t *testing.T) *testDependencyProvider {
 	return &testDependencyProvider{
 		SimpleLoggerWithClient: x.SimpleLoggerWithClient{
 			L: logrusx.New("kratos", "test"),
+			T: otelx.NewNoop(nil, nil),
 		},
 		TestProvider: jsonnetsecure.NewTestProvider(t),
 	}
