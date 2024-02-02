@@ -73,7 +73,7 @@ func NewErrorValidationRegistrationCodeInvalidOrAlreadyUsed() *Message {
 
 func NewErrorValidationRegistrationRetrySuccessful() *Message {
 	return &Message{
-		ID:   ErrorValidateionRegistrationRetrySuccess,
+		ID:   ErrorValidationRegistrationRetrySuccess,
 		Type: Error,
 		Text: "The request was already completed successfully and can not be retried.",
 	}

@@ -161,7 +161,7 @@ const (
 const (
 	ErrorValidationRegistration                         ID = 4040000 + iota
 	ErrorValidationRegistrationFlowExpired                 // 4040001
-	ErrorValidateionRegistrationRetrySuccess               // 4040002
+	ErrorValidationRegistrationRetrySuccess                // 4040002
 	ErrorValidationRegistrationCodeInvalidOrAlreadyUsed    // 4040003
 )
 
