@@ -70,13 +70,13 @@ type testConfig struct {
 	browserClient    *http.Client
 	kratosPublicTS   *httptest.Server
 	clientAppTS      *httptest.Server
-	hydraAdminClient hydraclientgo.OAuth2Api
+	hydraAdminClient *hydraclientgo.OAuth2ApiService
 	consentRemember  bool
 	requestedScope   []string
 	callTrace        *[]callTrace
 }
 
-func createHydraOAuth2ApiClient(url string) hydraclientgo.OAuth2Api {
+func createHydraOAuth2ApiClient(url string) *hydraclientgo.OAuth2ApiService {
 	configuration := hydraclientgo.NewConfiguration()
 	configuration.Host = urlx.ParseOrPanic(url).Host
 	configuration.Servers = hydraclientgo.ServerConfigurations{{URL: url}}
@@ -84,7 +84,7 @@ func createHydraOAuth2ApiClient(url string) hydraclientgo.OAuth2Api {
 	return hydraclientgo.NewAPIClient(configuration).OAuth2Api
 }
 
-func createOAuth2Client(t *testing.T, ctx context.Context, hydraAdmin hydraclientgo.OAuth2Api, redirectURIs []string, scope string, skipConsent bool) string {
+func createOAuth2Client(t *testing.T, ctx context.Context, hydraAdmin *hydraclientgo.OAuth2ApiService, redirectURIs []string, scope string, skipConsent bool) string {
 	t.Helper()
 
 	clientName := "kratos-hydra-integration-test-client-1"
@@ -133,7 +133,8 @@ func newHydra(t *testing.T, loginUI string, consentUI string) (hydraAdmin string
 
 	hydraResource, err := pool.RunWithOptions(&dockertest.RunOptions{
 		Repository: "oryd/hydra",
-		Tag:        "v2.2.0",
+		// Keep tag in sync with the version in ci.yaml
+		Tag: "v2.2.0@sha256:6c0f9195fe04ae16b095417b323881f8c9008837361160502e11587663b37c09",
 		Env: []string{
 			"DSN=memory",
 			fmt.Sprintf("URLS_SELF_ISSUER=http://127.0.0.1:%d/", publicPort),
