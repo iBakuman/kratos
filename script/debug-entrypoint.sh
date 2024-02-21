@@ -17,14 +17,17 @@ build() {
   log "Building ${SERVICE_NAME} binary"
   go env -w GOPROXY="proxy.golang.org,direct"
   go mod download
-  go build -buildvcs=false -gcflags "all=-N -l" -o /${SERVICE_NAME}
+  if ! go build -buildvcs=false -gcflags "all=-N -l" -o /${SERVICE_NAME};then
+    echo -e "\033[31m[ERROR]Build failed"
+    return 1
+  fi
 }
 
 start() {
   log "Starting Delve"
   (
     kill_dlv() {
-      log "kill dlv_pid: $dlv_pid"
+      log "Kill dlv_pid: $dlv_pid"
       kill -9 "$dlv_pid"
       exit 0
     }
@@ -32,16 +35,18 @@ start() {
     while true; do
       dlv --listen=:"${DELVE_PORT}" --headless=true --api-version=2 --accept-multiclient exec /"${SERVICE_NAME}" -- ${SERVICE_ARGS} &
       dlv_pid=$!
-      log "get dlv_pid: $dlv_pid"
+      echo -e "\033[34m[INFO]Debugger started successfully, its pid is $dlv_pid"
       wait
     done
   )&
   loop_pid=$!
-  log "get loop_pid: $loop_pid"
+  echo -e "\033[32m[INFO]Get loop_pid: $loop_pid"
 }
 
 restart() {
-  build
+  if ! build;then
+    return 1
+  fi
 
   log "Killing old processes"
   kill "$loop_pid"
@@ -51,7 +56,7 @@ restart() {
 }
 
 watch() {
-  log "Watching for changes"
+  echo -e "\033[32m[INFO]Watching for changes"
   inotifywait -e "MODIFY,DELETE,MOVED_TO,MOVED_FROM" -m -r ${PWD} | (
     while true; do
       read path action file
@@ -85,6 +90,5 @@ watch() {
 
 # main part
 init
-build
-start
+if build;then start; fi
 watch
