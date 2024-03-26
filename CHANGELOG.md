@@ -5,7 +5,7 @@
 
 **Table of Contents**
 
-- [ (2024-03-15)](#2024-03-15)
+- [ (2024-03-22)](#2024-03-22)
   - [Breaking Changes](#breaking-changes)
     - [Bug Fixes](#bug-fixes)
     - [Features](#features)
@@ -322,7 +322,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# [](https://github.com/ory/kratos/compare/v1.1.0...v) (2024-03-15)
+# [](https://github.com/ory/kratos/compare/v1.1.0...v) (2024-03-22)
 
 ## Breaking Changes
 
@@ -347,6 +347,9 @@ defaults to `false`.
   ([b291c95](https://github.com/ory/kratos/commit/b291c959c18c72f5edc55607ab23b4592faf8d53))
 - Audit issues ([#3797](https://github.com/ory/kratos/issues/3797))
   ([7017490](https://github.com/ory/kratos/commit/7017490caa9c70e22d5c626773c0266521813ff5))
+- Drop trigram index on identifiers
+  ([#3827](https://github.com/ory/kratos/issues/3827))
+  ([8f8fd90](https://github.com/ory/kratos/commit/8f8fd90304886ecd689a85fc60c4712e47526cdd))
 - Ignore decrypt errors in WithDeclassifiedCredentials
   ([#3731](https://github.com/ory/kratos/issues/3731))
   ([8f5192f](https://github.com/ory/kratos/commit/8f5192fbb74c4b952029a6856284de8d59027770))
@@ -379,6 +382,9 @@ defaults to `false`.
   ([b8b747b](https://github.com/ory/kratos/commit/b8b747b2adc59c8cf938a0ee30accdb4135634b8))
 - Add twitter SSO ([#3778](https://github.com/ory/kratos/issues/3778))
   ([930fb19](https://github.com/ory/kratos/commit/930fb19842e527e5e9c415efa983b36e02829516))
+- Add verification hook to login flow
+  ([#3829](https://github.com/ory/kratos/issues/3829))
+  ([43e4ead](https://github.com/ory/kratos/commit/43e4eadce7fa6e66bf1f9c03136d141bffd3094f))
 - Control edge cache ttl ([#3808](https://github.com/ory/kratos/issues/3808))
   ([c9dcce5](https://github.com/ory/kratos/commit/c9dcce5a41137937df1aad7ac81170b443740f88))
 - Linkedin v2 provider ([#3804](https://github.com/ory/kratos/issues/3804))
@@ -394,6 +400,12 @@ defaults to `false`.
 - Send OIDC claim keys to tracing
   ([#3798](https://github.com/ory/kratos/issues/3798))
   ([04390be](https://github.com/ory/kratos/commit/04390bee426befe51af2ee8177afabaa9ce4fa80))
+- Use authenticate endpoint for x
+  ([#3833](https://github.com/ory/kratos/issues/3833))
+  ([3d9ba5d](https://github.com/ory/kratos/commit/3d9ba5df85e0d0c4d8002365987e536b37678104)):
+
+  Improves the "Log in with X" experience by not asking the user to
+  re-authenticate every time.
 
 ### Tests
 
