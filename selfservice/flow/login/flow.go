@@ -151,6 +151,9 @@ type Flow struct {
 	// It can, for example, contain a reference to the verification flow, created as part of the user's
 	// registration.
 	ContinueWithItems []flow.ContinueWith `json:"-" db:"-" faker:"-" `
+
+	// ReturnToVerification contains the redirect URL for the verification flow.
+	ReturnToVerification string `json:"-" db:"-"`
 }
 
 var _ flow.Flow = new(Flow)
@@ -318,4 +321,8 @@ func (f *Flow) AddContinueWith(c flow.ContinueWith) {
 
 func (f *Flow) ContinueWith() []flow.ContinueWith {
 	return f.ContinueWithItems
+}
+
+func (f *Flow) SetReturnToVerification(to string) {
+	f.ReturnToVerification = to
 }
