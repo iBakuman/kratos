@@ -131,19 +131,19 @@ sdk: .bin/swagger .bin/ory node_modules
 
 	(cd internal/httpclient; rm -rf go.mod go.sum test api docs)
 
-	rm -rf internal/client-go
-	mkdir -p internal/client-go/
+	rm -rf ~/projects/go/kratos-client-go
+	mkdir -p ~/projects/go/kratos-client-go/
 	npm run openapi-generator-cli -- generate -i "spec/api.json" \
 		-g go \
-		-o "internal/client-go" \
+		-o ~/projects/go/kratos-client-go \
 		--git-user-id ory \
-		--git-repo-id client-go \
+		--git-repo-id kratos-client-go \
 		--git-host github.com \
-		--api-name-suffix "Api" \
+		--api-name-suffix "API" \
 		-t .schema/openapi/templates/go \
 		-c .schema/openapi/gen.go.yml
 
-	(cd internal/client-go; go mod edit -module github.com/ory/client-go go.mod; rm -rf test api docs)
+	# (cd internal/client-go; go mod edit -module github.com/ory/client-go go.mod; rm -rf test api docs)
 
 	make format
 
